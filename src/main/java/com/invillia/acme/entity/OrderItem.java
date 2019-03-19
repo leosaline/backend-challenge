@@ -64,5 +64,4 @@ public class OrderItem {
 	public void setOrderPurchase(OrderPurchase orderPurchase) {
 		this.orderPurchase = orderPurchase;
 	}
-
 }

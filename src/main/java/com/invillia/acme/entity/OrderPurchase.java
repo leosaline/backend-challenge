@@ -76,4 +76,10 @@ public class OrderPurchase {
 		this.orderItem = orderItem;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		OrderPurchase temp = (OrderPurchase) obj;
+		return this.getId().equals(temp.getId());
+	}
+
 }

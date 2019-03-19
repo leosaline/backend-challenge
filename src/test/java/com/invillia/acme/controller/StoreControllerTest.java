@@ -2,9 +2,14 @@ package com.invillia.acme.controller;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,10 +45,37 @@ public class StoreControllerTest {
 	}
 
 	@Test
+	public void whenGetStoreByParameterThenReturnCollectionStore() throws Exception {
+		Collection<Store> collStore = new ArrayList<Store>();
+		Store storeAdd = new Store();
+		storeAdd.setId(1);
+		storeAdd.setAddress("address");
+		storeAdd.setName("name");
+		collStore.add(storeAdd);
+
+		when(service.findByParameter(store)).thenReturn(collStore);
+
+		mvc.perform(get("/store").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+	}
+
+	@Test
 	public void whenCreateStoreThenReturnStore() throws Exception {
 		when(service.save(store)).thenReturn(store);
 
 		mvc.perform(post("/store").content(mapper.writeValueAsString(store)).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk());
+				.andExpect(status().isOk()).andExpect(jsonPath("$.address", is(store.getAddress())));
+	}
+
+	@Test
+	public void whenUpdateStoreThenReturnStoreUpdated() throws Exception {
+		Store storeUpdate = new Store();
+		storeUpdate.setAddress("altered");
+		storeUpdate.setId(1);
+
+		when(service.updateStore(store)).thenReturn(storeUpdate);
+
+		mvc.perform(patch("/store").content(mapper.writeValueAsString(store))
+				.contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.address", is(storeUpdate.getAddress())));
 	}
 }

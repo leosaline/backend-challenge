@@ -37,4 +37,10 @@ public class Store {
 		this.address = address;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		Store temp = (Store) obj;
+		return this.getId().equals(temp.getId());
+	}
+
 }

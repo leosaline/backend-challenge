@@ -56,4 +56,9 @@ public class Payment {
 		this.orderPurchase = orderPurchase;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		Payment temp = (Payment) obj;
+		return this.getId().equals(temp.getId());
+	}
 }

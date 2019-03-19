@@ -1,6 +1,7 @@
 package com.invillia.acme.controller;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,11 +35,12 @@ public class StoreController {
 
 	@RequestMapping(value = "/store", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<Collection<Store>> getStoreByParameter(@RequestParam("name") String name,
-			@RequestParam("address") String address) {
+	public ResponseEntity<Collection<Store>> getStoreByParameter(
+			@RequestParam(value = "name", required = false) Optional<String> name,
+			@RequestParam(value = "address", required = false) Optional<String> address) {
 		Store store = new Store();
-		store.setName(name);
-		store.setAddress(address);
+		store.setName(name.isPresent() ? name.get() : null);
+		store.setAddress(address.isPresent() ? address.get() : null);
 		return ResponseEntity.ok(this.storeService.findByParameter(store));
 	}
 
