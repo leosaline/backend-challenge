@@ -20,4 +20,7 @@ public interface OrderRepository extends JpaRepository<OrderPurchase, Integer> {
 
 	@Query("SELECT o FROM OrderPurchase o WHERE o.status = ?1")
 	public Collection<OrderPurchase> findOrderByStatus(Status status);
+
+	@Query("SELECT o FROM OrderPurchase o WHERE o.orderItem = ?1 ")
+	public OrderPurchase findOrderPurchaseByOrderItemId(Integer id);
 }

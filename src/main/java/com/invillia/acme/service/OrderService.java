@@ -11,7 +11,7 @@ public interface OrderService {
 
 	public Collection<OrderPurchase> findByParameter(OrderPurchase order);
 
-	public OrderPurchase refundOrderPurchase(OrderPurchase orderPurchase);
+	public OrderPurchase refundOrderPurchase(Integer id);
 
 	public OrderItem refundOrderItem(OrderItem orderItem);
 

@@ -1,5 +1,7 @@
 package com.invillia.acme.serviceimp;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,7 @@ import com.invillia.acme.service.PaymentService;
 public class PaymentServiceImp implements PaymentService {
 	@Autowired
 	PaymentRepository paymentRepository;
-	
+
 	@Autowired
 	OrderPurchaseClient orderPurchaseClient;
 
@@ -22,6 +24,7 @@ public class PaymentServiceImp implements PaymentService {
 	public Payment save(Payment payment) {
 		OrderPurchase orderPurchase = orderPurchaseClient.getOrderPurchase(payment.getOrderPurchase());
 		orderPurchase.setStatus(Status.CONCLUDED);
+		orderPurchase.setConfirmationDate(new Date());
 
 		orderPurchaseClient.updateOrderPurchase(orderPurchase);
 

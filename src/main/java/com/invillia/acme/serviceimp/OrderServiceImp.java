@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,28 +52,44 @@ public class OrderServiceImp implements OrderService {
 	}
 
 	@Override
-	public OrderPurchase refundOrderPurchase(OrderPurchase orderPurchase) {
-		Payment payment = paymentClient.getPayment(orderPurchase.getId());
+	public OrderPurchase refundOrderPurchase(Integer id) {
+		Optional<OrderPurchase> orderPurchase = orderRepository.findById(id);
+		Payment payment = null;
 
-		if (payment == null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found!");
-		}
+		if (orderPurchase.isPresent()) {
+			try {
+				CompletableFuture<Payment> cft = paymentClient.getPayment(orderPurchase.get().getId());
+				CompletableFuture.allOf(cft).join();
+				payment = cft.get();
+			} catch (Exception e) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Problem during execution!");
+			}
 
-		LocalDate now = LocalDate.now();
-		LocalDate tenDaysBehind = new java.sql.Date(orderPurchase.getConfirmationDate().getTime()).toLocalDate();
-		Period period = Period.between(now, tenDaysBehind);
+			if (payment == null) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found!");
+			}
 
-		if (Status.CONCLUDED.equals(payment.getStatus()) && (period.getDays() < 10)) {
-			paymentClient.deletePayment(payment.getId());
-			return orderPurchase;
+			LocalDate now = LocalDate.now();
+			LocalDate tenDaysBehind = new java.sql.Date(orderPurchase.get().getConfirmationDate().getTime())
+					.toLocalDate();
+			Period period = Period.between(now, tenDaysBehind);
+
+			if (Status.CONCLUDED.equals(payment.getStatus()) && (period.getDays() < 10)) {
+				paymentClient.deletePayment(payment.getId());
+				return orderPurchase.get();
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Refund not permited!");
+			}
 		} else {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Refund not permited!");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found!");
 		}
 	}
 
 	@Override
 	public OrderItem refundOrderItem(OrderItem orderItem) {
-		return null;
+		OrderPurchase orderPurchase = orderRepository.findOrderPurchaseByOrderItemId(orderItem.getId());
+		this.refundOrderPurchase(orderPurchase.getId());
+		return orderItem;
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package com.invillia.acme.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,13 +30,11 @@ public class PaymentController {
 		return ResponseEntity.ok(this.paymentService.save(payment));
 	}
 
-	@RequestMapping(value = "/payment", method = RequestMethod.DELETE, produces = "application/json")
+	@RequestMapping(value = "/payment/{id}", method = RequestMethod.DELETE, produces = "application/json")
 	@ResponseBody
-	public BodyBuilder deletePayment(@PathVariable Integer id) {
+	public void deletePayment(@PathVariable Integer id) {
 		Payment payment = new Payment();
 		payment.setId(id);
 		this.paymentService.delete(payment);
-
-		return ResponseEntity.ok();
 	}
 }

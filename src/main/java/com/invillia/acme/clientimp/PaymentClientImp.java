@@ -1,6 +1,9 @@
 package com.invillia.acme.clientimp;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,9 +23,11 @@ public class PaymentClientImp implements PaymentClient {
 		restTemplate.setRequestFactory(requestFactory);
 	}
 
+	@Async
 	@Override
-	public Payment getPayment(Integer id) {
-		return restTemplate.getForObject(URL_CALL_PAYMENT + PAYMENT + "/" + ORDER + "/" + id, Payment.class);
+	public CompletableFuture<Payment> getPayment(Integer id) {
+		Payment payment = restTemplate.getForObject(URL_CALL_PAYMENT + PAYMENT + "/" + ORDER + "/" + id, Payment.class);
+		return CompletableFuture.completedFuture(payment);
 	}
 
 	@Override

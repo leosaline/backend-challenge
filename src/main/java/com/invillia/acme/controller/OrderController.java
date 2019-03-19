@@ -2,6 +2,7 @@ package com.invillia.acme.controller;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,26 +40,26 @@ public class OrderController {
 	@RequestMapping(value = "/order", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<Collection<OrderPurchase>> getOrderByParameter(
-			@RequestParam("confirmationDate") Date confirmationDate, @RequestParam("address") String address,
-			@RequestParam("status") Status status) {
+			@RequestParam("confirmationDate") Optional<Date> confirmationDate,
+			@RequestParam("address") Optional<String> address, @RequestParam("status") Optional<Status> status) {
 		OrderPurchase order = new OrderPurchase();
-		order.setConfirmationDate(confirmationDate);
-		order.setAddress(address);
-		order.setStatus(status);
+		order.setConfirmationDate(confirmationDate.isPresent() ? confirmationDate.get() : null);
+		order.setAddress(address.isPresent() ? address.get() : null);
+		order.setStatus(status.isPresent() ? status.get() : null);
 
 		return ResponseEntity.ok(this.orderService.findByParameter(order));
 	}
-	
+
 	@RequestMapping(value = "/order/update", method = RequestMethod.PATCH, produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<OrderPurchase> updateOrderPurchase(@RequestBody OrderPurchase order) {
 		return ResponseEntity.ok(this.orderService.updateOrderPurchase(order));
-	}	
+	}
 
-	@RequestMapping(value = "/order/refund/order", method = RequestMethod.PATCH, produces = "application/json")
+	@RequestMapping(value = "/order/refund/order/{id}", method = RequestMethod.PATCH, produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<OrderPurchase> refundOrderPurchase(@RequestBody OrderPurchase order) {
-		return ResponseEntity.ok(this.orderService.refundOrderPurchase(order));
+	public ResponseEntity<OrderPurchase> refundOrderPurchase(@PathVariable Integer id) {
+		return ResponseEntity.ok(this.orderService.refundOrderPurchase(id));
 	}
 
 	@RequestMapping(value = "/order/refund/orderitem", method = RequestMethod.PATCH, produces = "application/json")
