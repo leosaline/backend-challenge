@@ -23,7 +23,7 @@ import com.invillia.acme.service.OrderService;
 public class OrderController {
 
 	@Autowired
-	OrderService orderService;
+	private OrderService orderService;
 
 	@RequestMapping(value = "/order", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
