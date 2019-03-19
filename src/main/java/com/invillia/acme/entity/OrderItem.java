@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 public class OrderItem {
 	@Id
@@ -20,6 +22,7 @@ public class OrderItem {
 	private Integer quantity;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "orderpurchase_id")
+	@JsonBackReference
 	private OrderPurchase orderPurchase;
 
 	public Integer getId() {

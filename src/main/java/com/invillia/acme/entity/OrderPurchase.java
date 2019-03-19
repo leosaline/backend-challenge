@@ -12,10 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.invillia.acme.enumerator.Status;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class OrderPurchase {
 
 	@Id
@@ -24,8 +25,16 @@ public class OrderPurchase {
 	private String address;
 	private Date confirmationDate;
 	private Status status;
-	@OneToMany(mappedBy = "orderPurchase", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JsonManagedReference
+	@OneToMany(mappedBy = "orderPurchase", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<OrderItem> orderItem;
+
+	public OrderPurchase(Integer id) {
+		this.id = id;
+	}
+
+	public OrderPurchase() {
+	}
 
 	public Integer getId() {
 		return id;

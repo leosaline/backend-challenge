@@ -1,11 +1,13 @@
 package com.invillia.acme.clientimp;
 
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.invillia.acme.client.PaymentClient;
 import com.invillia.acme.entity.Payment;
 
+@Component
 public class PaymentClientImp implements PaymentClient {
 	private static final String URL_CALL_PAYMENT = "http://localhost:8080/";
 	private static final String PAYMENT = "payment";
