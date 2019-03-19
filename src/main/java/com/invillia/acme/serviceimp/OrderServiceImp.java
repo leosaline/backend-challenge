@@ -1,14 +1,21 @@
 package com.invillia.acme.serviceimp;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.invillia.acme.client.PaymentClient;
 import com.invillia.acme.entity.OrderItem;
 import com.invillia.acme.entity.OrderPurchase;
+import com.invillia.acme.entity.Payment;
+import com.invillia.acme.enumerator.Status;
 import com.invillia.acme.repository.OrderRepository;
 import com.invillia.acme.service.OrderService;
 
@@ -16,6 +23,9 @@ import com.invillia.acme.service.OrderService;
 public class OrderServiceImp implements OrderService {
 	@Autowired
 	OrderRepository orderRepository;
+
+	@Autowired
+	PaymentClient paymentClient;
 
 	@Override
 	public OrderPurchase save(OrderPurchase order) {
@@ -41,8 +51,22 @@ public class OrderServiceImp implements OrderService {
 
 	@Override
 	public OrderPurchase refundOrderPurchase(OrderPurchase orderPurchase) {
-		// TODO Auto-generated method stub
-		return null;
+		Payment payment = paymentClient.getPayment(orderPurchase.getId());
+
+		if (payment == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found!");
+		}
+
+		LocalDate now = LocalDate.now();
+		LocalDate tenDaysBehind = new java.sql.Date(orderPurchase.getConfirmationDate().getTime()).toLocalDate();
+		Period period = Period.between(now, tenDaysBehind);
+
+		if (Status.CONCLUDED.equals(payment.getStatus()) && (period.getDays() < 10)) {
+			paymentClient.deletePayment(payment.getId());
+			return orderPurchase;
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Refund not permited!");
+		}
 	}
 
 	@Override
