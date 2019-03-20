@@ -50,12 +50,13 @@ public class StoreControllerTest {
 		Store storeAdd = new Store();
 		storeAdd.setId(1);
 		storeAdd.setAddress("address");
-		storeAdd.setName("name");
+		storeAdd.setName("bob");
 		collStore.add(storeAdd);
 
 		when(service.findByParameter(store)).thenReturn(collStore);
 
-		mvc.perform(get("/store").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+		mvc.perform(get("/store").param("name", "bob").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
 	}
 
 	@Test
